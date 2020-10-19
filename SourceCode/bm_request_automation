@@ -3,16 +3,20 @@ var secretaryEmailAddress ;
 var treasurerEmailAddress ;
 var requestorEmailAddress;
 
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // To Edit Google Sheet From Mobile
+
 function onEdit(e){
   setDefaultValue(e);
   sendAlert();
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Sending Notification Based On Status
+
 function sendAlert() {
   var activeCell = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getActiveCell().getA1Notation();
-  var statusforAlert = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("BM_Requests").getRange(activeCell);
+  var statusforAlert = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("BM_Requests").getRange(activeCell); 
   var status = statusforAlert.getValue();
 
   // Setting email address for different roles
@@ -20,15 +24,18 @@ function sendAlert() {
   statusCheckandEmail(status);
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Based on different status set email address
-function statusCheckandEmail(status) {
 
+function statusCheckandEmail(status) {
+  
   var message;
   var subject;
       switch (status)  {
           case "ApprovalPending":
               emailId = ameerEmailAddress;
               hideCols();
+              hideRows();
               break;
           case "FundRelease":
           case "ProofSubmitted":
@@ -39,6 +46,7 @@ function statusCheckandEmail(status) {
           case "Rejected":
               emailId = secretaryEmailAddress + ',' + requestorEmailAddress;
               unhideCols();
+              showAllRows();
               break;
           case "ProofPending":
               emailId = requestorEmailAddress;
@@ -49,7 +57,7 @@ function statusCheckandEmail(status) {
               emailId = "";
               break;
       }
-
+  
   if((status != "New") && (status != "ProofPending")){
     message = "There is a status change for a request. Current status of the Request is " + status + " , Take appropriate action if required! <br><br> click here to access " + "https://docs.google.com/spreadsheets/d/1T3W3NInexz79a6rwMopTgheLfWvoANTesIME8x2_574/edit?usp=sharing";
     subject = "BM Request:Status Change Alert";
@@ -57,7 +65,9 @@ function statusCheckandEmail(status) {
   sendEmail(message,subject,emailId);
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //send email
+
 function sendEmail(message,subject,emailId){
   if(emailId!=""){
         MailApp.sendEmail({
@@ -68,29 +78,33 @@ function sendEmail(message,subject,emailId){
       }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 function getRequestId(){
   var activeCell = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getActiveCell().getA1Notation();
-  var statusforAlert = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("BM_Requests").getRange(activeCell);
+  var statusforAlert = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("BM_Requests").getRange(activeCell); 
   //statusforAlert.getRowIndex();
   return SpreadsheetApp.getActiveSpreadsheet().getRange("A" + statusforAlert.getRowIndex()).getValue();
 }
 
-
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Configuration set up for email address
 function setEmaildAddress(activeCell){
   ameerEmailAddress = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Status").getRange('F2').getValue();
   secretaryEmailAddress = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Status").getRange('G2').getValue();
   treasurerEmailAddress = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Status").getRange('H2').getValue();
-  var spreadsheet = SpreadsheetApp.getActive();
+  var spreadsheet = SpreadsheetApp.getActive();  
   var rowNumber = spreadsheet.getActiveCell().getRow();
   requestorEmailAddress = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("BM_Requests").getRange("F" + rowNumber).getValue();
 }
 
-
-
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //Hiding a column
+
 function hideCols() {
     var sh = SpreadsheetApp.getActive().getSheetByName('BM_Requests')
+    sh.hideColumns(1);
+    sh.hideColumns(2);
     sh.hideColumns(5);
     sh.hideColumns(6);
     sh.hideColumns(7);
@@ -99,14 +113,18 @@ function hideCols() {
     sh.hideColumns(10);
     sh.hideColumns(11);
     sh.hideColumns(13);
-    sh.hideColumns(18);
     sh.hideColumns(19);
-    sh.hideColumns(21);
+    sh.hideColumns(20);
+    sh.hideColumns(22);
 };
 
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //Unhide a column
+
 function unhideCols() {
     var sh = SpreadsheetApp.getActive().getSheetByName('BM_Requests');
+    sh.showColumns(1);
+    sh.showColumns(2);
     sh.showColumns(5);
     sh.showColumns(6);
     sh.showColumns(7);
@@ -115,65 +133,98 @@ function unhideCols() {
     sh.showColumns(10);
     sh.showColumns(11);
     sh.showColumns(13);
-    sh.showColumns(18);
     sh.showColumns(19);
-    sh.showColumns(21);
+    sh.showColumns(20);
+    sh.showColumns(22);
 
 };
 
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function hideRows(){
       var sh = SpreadsheetApp.getActive().getSheetByName('BM_Requests')
       var range = sh.getRange(1, 1, sh.getLastRow());
-
+  
      var activeCell = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getActiveCell().getA1Notation();
      var activeRowRange = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("BM_Requests").getRange(activeCell);
      var activeRow = activeRowRange.getRowIndex();
-
+  
   //get the values to those rows
       var values = range.getValues();
 
     //go through every row
       for (var i=2; i<values.length; i++){
 
-        //if row value is equal to empty
+        //if row value is equal to empty  
         if(i!=activeRow){
 
         //hide that row
-        sh.hideRows(i);
-        }
+        sh.hideRows(i);   
+        }   
     }
 
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 function showAllRows(){
   var sh = SpreadsheetApp.getActive().getSheetByName('BM_Requests')
   sh.showRows(1,sh.getLastRow());
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 function setDefaultValue(e) {
  var sh = SpreadsheetApp.getActiveSheet();
  if(e.changeType === 'INSERT_ROW') {
  var row = sh.getActiveRange().getRow();
- sh.getRange(row, 2).setValue('New');
+ sh.getRange(row, 3).setValue('New');
+  }
+}
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// Getting the status of Proof Pending and pass respective emails and request id 's to next method to send reminder
+
+function getRequestwithStatusAndSendReminder(){
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getActiveSheet();
+  var rangeData = sheet.getDataRange();
+  var lastColumn = rangeData.getLastColumn();
+  var lastRow = rangeData.getLastRow();
+  var searchRange = sheet.getRange(2,1, lastRow-1, lastColumn-1);
+  
+  var rangeValues = searchRange.getValues();
+  
+  for ( i = 0; i < lastColumn - 1; i++){
+    for ( j = 0 ; j < lastRow - 1; j++){
+      if(rangeValues[j][i] === "ProofPending"){
+        Browser.msgBox(rangeValues[j][5]);
+        sendReminderAlert(rangeValues[j][5],rangeValues[j][0]);
+      } 
+    }
   }
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//Method to send Reminder Alert for those who are not sending proofs
 
-//
+function sendReminderAlert(emailId,requestId){
+   var msg = "Reminder : Your BM Request is Approved.<br><br> Please use this url to submit the proof " + "https://forms.gle/aXbWbbVQ2mbyGMF36 <br><br> Your Request Id is <strong>" + requestId + "</strong>.";
+   var sub = "Reminder : Proof Submission - BM Request:";
+   sendEmail(msg,sub,emailId);
+ }
 
-//function sendReminder(){
-//  var ss = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-//  var lr = ss.getLastRow();
-//  var emailList=[];
-//
-//  for(var i=2;i<=lr;i++){
-//    if(ss.getRange(i, 2).getValue() == 'ProofPending'){
-//      var currentEmail = ss.getRange(i, 24).getValue();
-//      emailList.push(currentEmail);
-//    }
-//  }
-//  for(var i=0;i<=emailList.length;i++){
-//    Browser.msgBox(emailList[i]);
-//  }
-//}
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//Method to get last non empty Row
+
+function getLastnonEmptyRow(sheet,startRow){
+  //Get all data for the given column
+  var data = sheet.getRange(startRow, 3,sheet.getLastRow()).getValues();
+  
+   // Iterate backwards and find first non empty cell
+  for(var i = data.length - 1 ; i >= 0 ; i--){
+    if (data[i][0] != null && data[i][0] != ""){
+      return i + 1;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
